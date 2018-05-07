@@ -12,6 +12,7 @@ const takeUntil = sSrc => src => (start, sink) => {
       } else if (st === 1) {
         talkback(2);
         sTalkback(2);
+        sink(2);
         done = true;
       }
       !done && sink(t, d);
