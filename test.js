@@ -148,7 +148,7 @@ test('it returns a source that disposes upon upwards END (2)', function (t) {
     return source;
   }
 
-  function makeSink(type, data) {
+  function makeSink() {
     let talkback;
     return (type, data) => {
       const et = downwardsExpectedType.shift();
