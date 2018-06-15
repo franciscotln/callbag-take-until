@@ -1,22 +1,40 @@
 const takeUntil = sSrc => src => (start, sink) => {
-  let talkback, sTalkback;
+  if (start !== 0) return;
+  let sourceTalkback, sTalkback;
+  let inited = false;
   let done = false;
-  start === 0 && src(start, (t, d) => {
-    if (t === start) {
-      talkback = d;
-    }
-    sSrc(start, (st, sd) => {
-      if (st === start) {
-        sTalkback = sd;
-        sTalkback(1);
-      } else if (st === 1) {
-        talkback(2);
-        sTalkback(2);
-        sink(2);
+
+  src(0, (t, d) => {
+    if (t === 0) {
+      sourceTalkback = d;
+
+      sSrc(0, (st, sd) => {
+        if (done) return;
+
+        if (st === 0) {
+          sTalkback = sd;
+          sTalkback(1);
+          return
+        }
         done = true;
-      }
-      !done && sink(t, d);
-    });
+        sourceTalkback(2);
+        sTalkback(2);
+        inited && sink(2);
+      });
+
+      inited = true;
+
+      sink(0, (st, sd) => {
+        st === 2 && sTalkback(2);
+        !done && sourceTalkback(st, sd);
+      });
+
+      done && sink(2);
+      return;
+    }
+
+    t === 2 && sTalkback(2);
+    !done && sink(t, d);
   });
 };
 
