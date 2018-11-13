@@ -25,8 +25,9 @@ const takeUntil = sSrc => src => (start, sink) => {
       inited = true;
 
       sink(0, (st, sd) => {
+        if (done) return;
         st === 2 && sTalkback(2);
-        !done && sourceTalkback(st, sd);
+        sourceTalkback(st, sd);
       });
 
       done && sink(2);

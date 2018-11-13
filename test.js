@@ -231,3 +231,69 @@ test('it notifies the sink about termination', function (t) {
     t.end();
   }, 400);
 });
+
+test('it doesn\'t accept anything from the sink after being notified', function (t) {
+  t.plan(15);
+  const upwardsExpectedType = [
+    [0, 'function'],
+    [2, 'undefined']
+  ];
+  const downwardsExpectedType = [
+    [0, 'function'],
+    [2, 'undefined'],
+  ];
+  const notifierExpectedType = [
+    [0, 'function'],
+    [1, 'undefined'],
+    [2, 'undefined'],
+  ];
+
+  function makeSource() {
+    const source = (type, data) => {
+      const e = upwardsExpectedType.shift();
+      t.equals(type, e[0], 'upwards type is expected: ' + e[0]);
+      t.equals(typeof data, e[1], 'upwards data is expected: ' + e[1]);
+      if (type === 0) {
+        const sink = data;
+        sink(0, source);
+      }
+    };
+    return source;
+  }
+
+  function makeSink() {
+    return (type, data) => {
+      const et = downwardsExpectedType.shift();
+      t.equals(type, et[0], 'downwards type is expected: ' + et[0]);
+      t.equals(typeof data, et[1], 'downwards data type is expected: ' + et[1]);
+      if (type === 0) {
+        talkback = data;
+        data(2);
+      }
+    };
+  }
+
+  function makeNotifierSource() {
+    let sink;
+    const notifier = (type, data) => {
+      const e = notifierExpectedType.shift();
+      t.equals(type, e[0], 'notifier type is expected: ' + e[0]);
+      t.equals(typeof data, e[1], 'notifier data is expected: ' + e[1]);
+      if (type === 0) {
+        sink = data;
+        sink(0, notifier);
+      }
+      if (type === 1) {
+        sink(1, 'A');
+      }
+    }
+    return notifier;
+  }
+
+  takeUntil(makeNotifierSource())(makeSource())(0, makeSink());
+
+  setTimeout(() => {
+    t.pass('Nothing else happens');
+    t.end();
+  }, 400);
+});
