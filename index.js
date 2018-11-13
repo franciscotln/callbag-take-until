@@ -33,7 +33,7 @@ const takeUntil = sSrc => src => (start, sink) => {
     }
 
     t === 2 && sTalkback(2);
-    !done && sink(t, d);
+    sink(t, d);
   });
 };
 
