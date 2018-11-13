@@ -4,7 +4,7 @@
   "dependencies": {},
   "devDependencies": {
     "callbag-from-iter": "~1.0.0",
-    "callbag-from-promise": "~1.0.0",
+    "callbag-from-promise": "~1.1.0",
     "rollup": "^0.67.1",
     "tape": "~4.9.0"
   },
