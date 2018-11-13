@@ -1,7 +1,7 @@
 const test = require('tape');
 const fromPromise = require('callbag-from-promise');
 const fromIter = require('callbag-from-iter');
-const takeUntil = require('./index');
+const takeUntil = require('.');
 
 const newBagFromPromise = delay => fromPromise(new Promise(res => setTimeout(res, delay)));
 
