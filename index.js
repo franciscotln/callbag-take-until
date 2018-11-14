@@ -38,4 +38,4 @@ const takeUntil = sSrc => src => (start, sink) => {
   });
 };
 
-module.exports = takeUntil;
+export default takeUntil;
