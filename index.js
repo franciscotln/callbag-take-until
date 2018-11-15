@@ -14,6 +14,13 @@ const takeUntil = sSrc => src => (start, sink) => {
           sTalkback(1);
           return
         }
+        if (st === 2) {
+          if (sd) {
+            // handle error
+          }
+          sTalkback = null;
+          return
+        }
         done = true;
         sTalkback(2);
         sourceTalkback(2);
@@ -24,7 +31,7 @@ const takeUntil = sSrc => src => (start, sink) => {
 
       sink(0, (st, sd) => {
         if (done) return;
-        st === 2 && sTalkback(2);
+        st === 2 && sTalkback && sTalkback(2);
         sourceTalkback(st, sd);
       });
 
