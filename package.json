@@ -1,5 +1,11 @@
 {
   "author": "Francisco Tavares de Lima Neto",
+  "contributors": [
+    {
+      "name": "Mateusz Burzyński",
+      "email": "mateuszburzynski@gmail.com"
+    }
+  ],
   "description": "Emits the values emitted by the source Callbag until a notifier Callbag emits a value",
   "dependencies": {},
   "devDependencies": {
