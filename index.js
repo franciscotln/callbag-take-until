@@ -1,8 +1,10 @@
+const UNIQUE = {};
+
 const takeUntil = sSrc => src => (start, sink) => {
   if (start !== 0) return;
   let sourceTalkback, sTalkback;
   let inited = false;
-  let done = false;
+  let done = UNIQUE;
 
   src(0, (t, d) => {
     if (t === 0) {
@@ -14,28 +16,34 @@ const takeUntil = sSrc => src => (start, sink) => {
           sTalkback(1);
           return
         }
+        if (st === 1) {
+          done = undefined;
+          sTalkback(2);
+          sourceTalkback(2);
+          inited && sink(2);
+          return;
+        }
         if (st === 2) {
-          if (sd) {
-            // handle error
-          }
           sTalkback = null;
+
+          if (sd) {
+            done = sd;
+            sourceTalkback(2);
+            inited && sink(st, sd);
+          }
           return
         }
-        done = true;
-        sTalkback(2);
-        sourceTalkback(2);
-        inited && sink(2);
       });
 
       inited = true;
 
       sink(0, (st, sd) => {
-        if (done) return;
+        if (done !== UNIQUE) return;
         st === 2 && sTalkback && sTalkback(2);
         sourceTalkback(st, sd);
       });
 
-      done && sink(2);
+      done !== UNIQUE && sink(2, done);
       return;
     }
 
