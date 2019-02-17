@@ -1,54 +1,53 @@
 const UNIQUE = {};
 
-const takeUntil = sSrc => src => (start, sink) => {
+const takeUntil = notifier => source => (start, sink) => {
   if (start !== 0) return;
   let sourceTalkback;
-  let sTalkback;
+  let notifierTalkback;
   let inited = false;
   let done = UNIQUE;
 
-  src(0, (t, d) => {
-    if (t === 0) {
-      sourceTalkback = d;
+  source(0, (type, data) => {
+    if (type === 0) {
+      sourceTalkback = data;
 
-      sSrc(0, (st, sd) => {
-        if (st === 0) {
-          sTalkback = sd;
-          sTalkback(1);
+      notifier(0, (t, d) => {
+        if (t === 0) {
+          notifierTalkback = d;
+          notifierTalkback(1);
           return;
         }
-        if (st === 1) {
-          done = undefined;
-          sTalkback(2);
+        if (t === 1) {
+          done = void 0;
+          notifierTalkback(2);
           sourceTalkback(2);
-          inited && sink(2);
+          if (inited) sink(2);
           return;
         }
-        if (st === 2) {
-          sTalkback = null;
-
-          if (sd) {
-            done = sd;
+        if (t === 2) {
+          notifierTalkback = null;
+          done = d;
+          if (d != null) {
             sourceTalkback(2);
-            inited && sink(st, sd);
+            if (inited) sink(t, d);
           }
         }
       });
 
       inited = true;
 
-      sink(0, (st, sd) => {
+      sink(0, (t, d) => {
         if (done !== UNIQUE) return;
-        if (st === 2 && sTalkback) sTalkback(2);
-        sourceTalkback(st, sd);
+        if (t === 2 && notifierTalkback) notifierTalkback(2);
+        sourceTalkback(t, d);
       });
 
       if (done !== UNIQUE) sink(2, done);
       return;
     }
 
-    if (t === 2) sTalkback(2);
-    sink(t, d);
+    if (type === 2) notifierTalkback(2);
+    if (done === UNIQUE) sink(type, data);
   });
 };
 

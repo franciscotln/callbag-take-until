@@ -8,17 +8,15 @@
   ],
   "description": "Emits the values emitted by the source Callbag until a notifier Callbag emits a value",
   "dependencies": {
-    "callbag": "^1.1.0"
+    "callbag": "^1.2.0"
   },
   "devDependencies": {
-    "callbag-from-iter": "~1.0.0",
-    "callbag-from-promise": "~1.1.0",
-    "rollup": "^0.67.1",
-    "tape": "~4.9.0"
+    "callbag-from-iter": "^1.2.0",
+    "callbag-from-promise": "^1.2.0",
+    "rollup": "^1.2.1",
+    "tape": "^4.10.1"
   },
-  "keywords": [
-    "callbag"
-  ],
+  "keywords": ["callbag"],
   "license": "MIT",
   "main": "index.cjs.js",
   "module": "index.js",
