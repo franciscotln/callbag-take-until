@@ -16,7 +16,9 @@
     "rollup": "^1.2.1",
     "tape": "^4.10.1"
   },
-  "keywords": ["callbag"],
+  "keywords": [
+    "callbag"
+  ],
   "license": "MIT",
   "main": "index.cjs.js",
   "module": "index.js",
@@ -31,5 +33,5 @@
     "test": "tape test.js",
     "prepare": "npm test"
   },
-  "version": "2.0.1"
+  "version": "3.0.0"
 }
