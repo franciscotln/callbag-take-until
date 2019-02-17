@@ -299,25 +299,24 @@ test('it doesn\'t accept anything from the sink after being notified', function 
 });
 
 test('completed notifier doesn\'t complete the source', function (t) {
-  t.plan(17);
+  t.plan(12);
   const upwardsExpectedType = [
     [0, 'function'],
-    [2, 'undefined']
   ];
   const downwardsExpectedType = [
     [0, 'function'],
-    [1, 'number'],
-    [1, 'number'],
-    [1, 'number'],
+    [2, 'undefined'],
   ];
   const notifierExpectedType = [
     [0, 'function'],
     [1, 'undefined'],
   ];
 
+  let id;
+  let sourceTerminated = false;
+
   function makeSource() {
     let sent = 0;
-    let id;
     return function source(type, data) {
       const e = upwardsExpectedType.shift();
       t.equals(type, e[0], 'upwards type is expected: ' + e[0]);
@@ -329,6 +328,7 @@ test('completed notifier doesn\'t complete the source', function (t) {
         }, 100);
         sink(0, source);
       } else if (type === 2) {
+        sourceTerminated = true;
         clearInterval(id);
       }
     };
@@ -347,6 +347,7 @@ test('completed notifier doesn\'t complete the source', function (t) {
       }
 
       if (!downwardsExpectedType.length) {
+        // this will NOT terminate the source because the notifier completed before emitting any data.
         talkback(2);
       }
     };
@@ -373,6 +374,8 @@ test('completed notifier doesn\'t complete the source', function (t) {
 
   setTimeout(() => {
     t.pass('Nothing else happens');
+    t.false(sourceTerminated);
+    clearInterval(id);
     t.end();
   }, 400);
 });
@@ -442,4 +445,46 @@ test('errored notifier should error the sink', function (t) {
     t.pass('Nothing else happens');
     t.end();
   }, 400);
+});
+
+test('it terminates the sink if the notifier terminates earlier than source', function (t) {
+  let id;
+  let sinkGetsTerminated = false;
+  const result = [];
+  let n = 0;
+
+  const source = (start, sink) => {
+    if (start === 0) {
+      id = setInterval(() => sink(1, n++), 100);
+      sink(0, t => {
+        if (t === 2) clearInterval(id);
+      });
+    }
+  };
+
+  const notifier = (start, sink) => {
+    if (start === 0) {
+      sink(0, () => {});
+      sink(2);
+    }
+  };
+
+  const sink = source => {
+    let talkback;
+    source(0, (t, d) => {
+      if (t === 0) talkback = d;
+      if (t === 1) result.push(d);
+      if (t === 0 || t === 1) talkback(1);
+      if (t === 2) sinkGetsTerminated = true;
+    });
+  };
+
+  sink(takeUntil(notifier)(source));
+
+  setTimeout(() => {
+    clearInterval(id);
+    t.deepEqual(result, []);
+    t.true(sinkGetsTerminated);
+    t.end();
+  }, 450);
 });
