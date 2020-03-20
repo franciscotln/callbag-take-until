@@ -66,7 +66,7 @@ pipe(
       console.log('value', v);
     },
     complete() {
-      console.log('done'); // logs "done" but does not clear the interval!
+      console.log('done'); // won't ever be called
     }
   })
 );
