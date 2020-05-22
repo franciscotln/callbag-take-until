@@ -26,8 +26,8 @@ const takeUntil = notifier => source => (start, sink) => {
         }
         if (t === 2) {
           notifierTalkback = null;
-          done = d;
           if (d != null) {
+            done = d;
             sourceTalkback(2);
             if (inited) sink(t, d);
           }
@@ -46,8 +46,8 @@ const takeUntil = notifier => source => (start, sink) => {
       return;
     }
 
-    if (type === 2) notifierTalkback(2);
-    if (done === UNIQUE) sink(type, data);
+    if (type === 2 && notifierTalkback) notifierTalkback(2);
+    sink(type, data);
   });
 };
 
